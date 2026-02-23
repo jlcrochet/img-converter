@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libpng-dev libjpeg-dev \
+            libtiff-dev libwebp-dev libavif-dev libheif-dev libjxl-dev
+
+      - name: Build
+        run: make
+
+      - name: Package
+        run: gzip -c img-converter > img-converter-linux-x86_64.gz
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: img-converter-linux-x86_64.gz
+          path: img-converter-linux-x86_64.gz
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: img-converter-linux-x86_64.gz
