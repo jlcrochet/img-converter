@@ -1163,7 +1163,7 @@ static bool avif_write(const char *path, struct image *img, int quality)
 #ifdef HAVE_HEIF
 static bool heif_read(const char *path, struct image *img)
 {
-	heif_context *ctx = heif_context_alloc();
+	struct heif_context *ctx = heif_context_alloc();
 	if (!ctx) return false;
 
 	struct heif_error err = heif_context_read_from_file(ctx, path, NULL);
@@ -1172,7 +1172,7 @@ static bool heif_read(const char *path, struct image *img)
 		return false;
 	}
 
-	heif_image_handle *handle;
+	struct heif_image_handle *handle;
 	err = heif_context_get_primary_image_handle(ctx, &handle);
 	if (err.code != heif_error_Ok) {
 		heif_context_free(ctx);
@@ -1182,7 +1182,7 @@ static bool heif_read(const char *path, struct image *img)
 	bool has_alpha = heif_image_handle_has_alpha_channel(handle);
 	img->channels = has_alpha ? 4 : 3;
 
-	heif_image *heif_img;
+	struct heif_image *heif_img;
 	err = heif_decode_image(handle, &heif_img,
 							heif_colorspace_RGB,
 							has_alpha ? heif_chroma_interleaved_RGBA : heif_chroma_interleaved_RGB,
@@ -1235,7 +1235,7 @@ static bool heif_read(const char *path, struct image *img)
 
 static bool heif_write(const char *path, struct image *img, int quality)
 {
-	heif_context *ctx = heif_context_alloc();
+	struct heif_context *ctx = heif_context_alloc();
 	if (!ctx) return false;
 
 	if (!image_validate_dims(img)) {
@@ -1243,7 +1243,7 @@ static bool heif_write(const char *path, struct image *img, int quality)
 		return false;
 	}
 
-	heif_encoder *encoder;
+	struct heif_encoder *encoder;
 	struct heif_error err = heif_context_get_encoder_for_format(ctx, heif_compression_HEVC, &encoder);
 	if (err.code != heif_error_Ok) {
 		heif_context_free(ctx);
@@ -1252,7 +1252,7 @@ static bool heif_write(const char *path, struct image *img, int quality)
 
 	heif_encoder_set_lossy_quality(encoder, quality);
 
-	heif_image *heif_img;
+	struct heif_image *heif_img;
 	err = heif_image_create(img->width, img->height, heif_colorspace_RGB,
 							img->channels == 4 ? heif_chroma_interleaved_RGBA : heif_chroma_interleaved_RGB,
 							&heif_img);
