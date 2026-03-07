@@ -39,6 +39,9 @@
 #include "lib/stdio_helpers.h"
 #include "lib/checked_arith.h"
 
+static size_t max_pixels = 100000000;  // 0 = unlimited
+static size_t max_bytes = 268435456;   // 0 = unlimited
+
 // QOI format implementation (inline, no library needed)
 #define QOI_OP_INDEX  0x00
 #define QOI_OP_DIFF   0x40
@@ -141,9 +144,6 @@ struct image {
 	int height;
 	int channels;       // 3 = RGB, 4 = RGBA
 };
-
-static size_t max_pixels = 100000000;  // 0 = unlimited
-static size_t max_bytes = 268435456;   // 0 = unlimited
 
 static bool image_validate_dims(const struct image *img)
 {
